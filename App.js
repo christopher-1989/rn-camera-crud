@@ -1,13 +1,46 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, ImageBackground, Image } from 'react-native';
 import { Camera } from 'expo-camera';
+import { createSlice, configureStore } from '@reduxjs/toolkit';
+import { useDispatch, useSelector } from 'react-redux';
+
+const photosSlice = createSlice({
+  name: 'photos',
+  initialState: {
+    photos: []
+  },
+  reducers: {
+    addPhoto (state, action) {
+      state.photos.push(action.payload.uri)
+    }
+      // Redux Toolkit allows us to write "mutating" logic in reducers. It
+      // doesn't actually mutate the state because it uses the Immer library,
+      // which detects changes to a "draft state" and produces a brand new
+      // immutable state based off those changes    
+  }
+})
+
+export const { addPhoto } = photosSlice.actions;
+const store = configureStore({
+  reducer: photosSlice.reducer
+})
+
+// Can still subscribe to the store
+// store.subscribe(() => console.log(store.getState()))
+
+const selectPhotos = state => state.photos;
+
 
 export default function App() {
   
     const [startCamera,setStartCamera] = useState(false);
     const [previewVisible, setPreviewVisible] = useState(false);
     const [capturedImage, setCapturedImage] = useState(null);
-    const [photos, setPhotos] = useState([]);
+    // const dispatch = useDispatch();
+    const photos = store.getState().photos;
+
+
+    // const [photos, setPhotos] = useState([]);
     
     const __startCamera = async () => {
         const {status} = await Camera.requestPermissionsAsync()
@@ -24,7 +57,7 @@ export default function App() {
       const __takePicture = async () => {
         if (!camera) return
         const photo = await camera.takePictureAsync();
-        console.log(photo);
+        console.log(store.getState());
         setPreviewVisible(true);
         setCapturedImage(photo);
       }
@@ -36,15 +69,15 @@ export default function App() {
       }
 
       const __savePicture = () => {
-          setPhotos([...photos, capturedImage])
-          console.log(photos);
+          // setPhotos([...photos, capturedImage])
+          // console.log(capturedImage);
+          store.dispatch(addPhoto({uri: capturedImage.uri}))
           setStartCamera(false);
           setCapturedImage(null);
           setPreviewVisible(false);
       }
     
       const CameraPreview = ({ photo }) => {
-        console.log(photo)
         return (
           <View
             style={{
@@ -189,7 +222,7 @@ export default function App() {
           </TouchableOpacity>
           <View >
             {photos.map((photo, index) => 
-            <Image key={index} style={{width: 150, height: 150}} source={{uri: photo.uri}} />)
+            <Image key={index} style={{width: 150, height: 150}} source={{uri: photo}} />)
                 }
             </View>
         </View>)}
