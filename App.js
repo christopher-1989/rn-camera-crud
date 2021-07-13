@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, ImageBackground, Image, TextInput } from 'react-native';
+import { StyleSheet, View, SafeAreaView, Text, TouchableOpacity, ImageBackground, Image, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 import { Camera } from 'expo-camera';
 import { createSlice, configureStore } from '@reduxjs/toolkit';
 
@@ -18,7 +18,6 @@ const photosSlice = createSlice({
       state.photos.push(newPhoto)
     },
     editPhotoLabel (state, action) {
-      // console.log(action.payload.label);
       const newPhoto = state.photos[action.payload.index];
       newPhoto.label = action.payload.label;
       state.photos[action.payload.index] = newPhoto;
@@ -96,8 +95,8 @@ export default function App() {
       }
 
         return (
-    
-    <View style={styles.layout}>
+
+    <View style={styles.layout} >
       <Text style={styles.title}>Photos</Text>
       {/* check to see if the camera has started. If so, has an image been taken and is there a preview visable? */}
       {/* If so, prompt to either retake or save the photo */}
@@ -208,7 +207,7 @@ export default function App() {
       : 
       // If the camera has not been started display a button to take a picture.
       // If photos are available, display them in the View.
-      (<View>
+      (<KeyboardAvoidingView behavior={Platform.OS == 'ios' ? 'position' : 'height'}>
           <TouchableOpacity
             onPress={__startCamera}
             style={styles.button} >
@@ -220,21 +219,25 @@ export default function App() {
           </TouchableOpacity>
           <View >
             {photos.map((photo, index) => (
-              < View key={`container${index}`}>
-                <Image key={`image${index}`} style={{width: 150, height: 150}} source={{uri: photo.uri}} />
-                <TextInput 
-                  key={`photo${index}`} 
-                  placeholder={photo.label} 
-                  onChangeText={text => {
-                    store.dispatch(editPhotoLabel({index: index, label: text}))
+                <View key={`container${index}`} >
+                  <Image key={`image${index}`} style={{width: 150, height: 150}} source={{uri: photo.uri}} />
+                  <TextInput 
+                    key={`photo${index}`} 
+                    placeholder={photo.label}
+                    placeholderTextColor='black'
+                    clearButtonMode='always'
+                    returnKeyType='done'
+                    maxLength={40} 
+                    onChangeText={text => {
+                      store.dispatch(editPhotoLabel({index: index, label: text}))
+                    }
                   }
-                } //Write onchange function to save to redux state.
-                  />
-            </View>
+                    />
+                </View>
             ))
                 }
             </View>
-        </View>)}
+        </KeyboardAvoidingView>)}
     </View>
   );}
 
@@ -244,6 +247,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  inner: {
+    flex: 1,
+    
   },
   layout: {
     flex: 1,
