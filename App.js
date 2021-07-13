@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, ImageBackground, Image } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, ImageBackground, Image, TextInput } from 'react-native';
 import { Camera } from 'expo-camera';
 import { createSlice, configureStore } from '@reduxjs/toolkit';
-import { useDispatch, useSelector } from 'react-redux';
 
 const photosSlice = createSlice({
   name: 'photos',
@@ -11,36 +10,36 @@ const photosSlice = createSlice({
   },
   reducers: {
     addPhoto (state, action) {
-      state.photos.push(action.payload.uri)
-    }
-      // Redux Toolkit allows us to write "mutating" logic in reducers. It
-      // doesn't actually mutate the state because it uses the Immer library,
-      // which detects changes to a "draft state" and produces a brand new
-      // immutable state based off those changes    
+      const photoNumber = state.photos.length + 1;
+      const newPhoto = {
+        uri: action.payload.uri,
+        label: `Photo number ${photoNumber}`
+      }
+      state.photos.push(newPhoto)
+    },
+    editPhotoLabel (state, action) {
+      // console.log(action.payload.label);
+      const newPhoto = state.photos[action.payload.index];
+      newPhoto.label = action.payload.label;
+      state.photos[action.payload.index] = newPhoto;
+    },
   }
 })
 
-export const { addPhoto } = photosSlice.actions;
+export const { addPhoto, editPhotoLabel } = photosSlice.actions;
 const store = configureStore({
   reducer: photosSlice.reducer
 })
 
 // Can still subscribe to the store
-// store.subscribe(() => console.log(store.getState()))
-
-const selectPhotos = state => state.photos;
-
+// store.subscribe(() => console.log(store.getState()));
 
 export default function App() {
   
     const [startCamera,setStartCamera] = useState(false);
     const [previewVisible, setPreviewVisible] = useState(false);
     const [capturedImage, setCapturedImage] = useState(null);
-    // const dispatch = useDispatch();
     const photos = store.getState().photos;
-
-
-    // const [photos, setPhotos] = useState([]);
     
     const __startCamera = async () => {
         const {status} = await Camera.requestPermissionsAsync()
@@ -57,7 +56,6 @@ export default function App() {
       const __takePicture = async () => {
         if (!camera) return
         const photo = await camera.takePictureAsync();
-        console.log(store.getState());
         setPreviewVisible(true);
         setCapturedImage(photo);
       }
@@ -221,8 +219,19 @@ export default function App() {
             </Text>
           </TouchableOpacity>
           <View >
-            {photos.map((photo, index) => 
-            <Image key={index} style={{width: 150, height: 150}} source={{uri: photo}} />)
+            {photos.map((photo, index) => (
+              < View key={`container${index}`}>
+                <Image key={`image${index}`} style={{width: 150, height: 150}} source={{uri: photo.uri}} />
+                <TextInput 
+                  key={`photo${index}`} 
+                  placeholder={photo.label} 
+                  onChangeText={text => {
+                    store.dispatch(editPhotoLabel({index: index, label: text}))
+                  }
+                } //Write onchange function to save to redux state.
+                  />
+            </View>
+            ))
                 }
             </View>
         </View>)}
