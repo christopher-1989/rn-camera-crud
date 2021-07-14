@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, SafeAreaView, Text, TouchableOpacity, ImageBackground, Image, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
+import { StyleSheet, View, SafeAreaView, FlatList, Text, TouchableOpacity, ImageBackground, Image, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 import { Camera } from 'expo-camera';
 import { createSlice, configureStore } from '@reduxjs/toolkit';
 
@@ -18,7 +18,10 @@ const photosSlice = createSlice({
       state.photos.push(newPhoto)
     },
     editPhotoLabel (state, action) {
+      console.log(action.payload)
+      console.log(state)
       const newPhoto = state.photos[action.payload.index];
+      console.log(newPhoto);
       newPhoto.label = action.payload.label;
       state.photos[action.payload.index] = newPhoto;
     },
@@ -30,6 +33,23 @@ const store = configureStore({
   reducer: photosSlice.reducer
 })
 
+const Item = ({ photo, index }) => (
+  <View >
+    <Image style={{width: 150, height: 150}} source={{uri: photo.uri}} />
+    <TextInput 
+          placeholder={photo.label}
+          placeholderTextColor='black'
+          clearButtonMode='always'
+          returnKeyType='done'
+          maxLength={40} 
+          onChangeText={text => {
+            store.dispatch(editPhotoLabel({index: index, label: text}))
+          }
+        }
+        />
+  </View>
+);
+
 // Can still subscribe to the store
 // store.subscribe(() => console.log(store.getState()));
 
@@ -39,6 +59,8 @@ export default function App() {
     const [previewVisible, setPreviewVisible] = useState(false);
     const [capturedImage, setCapturedImage] = useState(null);
     const photos = store.getState().photos;
+
+    const renderItem = ({ item, index }) => <Item index={index} photo={item}  />;
     
     const __startCamera = async () => {
         const {status} = await Camera.requestPermissionsAsync()
@@ -96,7 +118,7 @@ export default function App() {
 
         return (
 
-    <View style={styles.layout} >
+    <SafeAreaView style={styles.layout} >
       <Text style={styles.title}>Photos</Text>
       {/* check to see if the camera has started. If so, has an image been taken and is there a preview visable? */}
       {/* If so, prompt to either retake or save the photo */}
@@ -208,17 +230,12 @@ export default function App() {
       // If the camera has not been started display a button to take a picture.
       // If photos are available, display them in the View.
       (<KeyboardAvoidingView behavior={Platform.OS == 'ios' ? 'position' : 'height'}>
-          <TouchableOpacity
-            onPress={__startCamera}
-            style={styles.button} >
-            <Text
-              style={styles.buttonText}
-            >
-              Add photo
-            </Text>
-          </TouchableOpacity>
-          <View >
-            {photos.map((photo, index) => (
+          <FlatList 
+          data={photos}
+          renderItem={renderItem}
+          keyExtractor={(item, index) => `Photo number ${index}`}
+          />
+            {/* {photos.map((photo, index) => (
                 <View key={`container${index}`} >
                   <Image key={`image${index}`} style={{width: 150, height: 150}} source={{uri: photo.uri}} />
                   <TextInput 
@@ -235,10 +252,18 @@ export default function App() {
                     />
                 </View>
             ))
-                }
-            </View>
+                } */}
+            <TouchableOpacity
+            onPress={__startCamera}
+            style={styles.button} >
+            <Text
+              style={styles.buttonText}
+            >
+              Add photo
+            </Text>
+          </TouchableOpacity>
         </KeyboardAvoidingView>)}
-    </View>
+    </SafeAreaView>
   );}
 
 const styles = StyleSheet.create({
