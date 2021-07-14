@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, SafeAreaView, FlatList, Text, TouchableOpacity, ImageBackground, Image, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
+import { ListItem, Avatar } from 'react-native-elements';
 import { Camera } from 'expo-camera';
 import { createSlice, configureStore } from '@reduxjs/toolkit';
 
@@ -18,10 +19,7 @@ const photosSlice = createSlice({
       state.photos.push(newPhoto)
     },
     editPhotoLabel (state, action) {
-      console.log(action.payload)
-      console.log(state)
       const newPhoto = state.photos[action.payload.index];
-      console.log(newPhoto);
       newPhoto.label = action.payload.label;
       state.photos[action.payload.index] = newPhoto;
     },
@@ -59,8 +57,6 @@ export default function App() {
     const [previewVisible, setPreviewVisible] = useState(false);
     const [capturedImage, setCapturedImage] = useState(null);
     const photos = store.getState().photos;
-
-    const renderItem = ({ item, index }) => <Item index={index} photo={item}  />;
     
     const __startCamera = async () => {
         const {status} = await Camera.requestPermissionsAsync()
@@ -232,8 +228,18 @@ export default function App() {
       (<KeyboardAvoidingView behavior={Platform.OS == 'ios' ? 'position' : 'height'}>
           <FlatList 
           data={photos}
-          renderItem={renderItem}
-          keyExtractor={(item, index) => `Photo number ${index}`}
+          renderItem={({ item, index }) => (
+            <ListItem bottomDivider roundAvatar>
+              <Avatar rounded source={{uri: item.uri}} />
+              <ListItem.Content>
+                <ListItem.Title>{item.label}</ListItem.Title>
+                <ListItem.Subtitle>{item.label}</ListItem.Subtitle>
+              </ListItem.Content>
+              <ListItem.Chevron />
+            </ListItem> ) 
+        
+        }
+          keyExtractor={(item, index) => index.toString()}
           />
             {/* {photos.map((photo, index) => (
                 <View key={`container${index}`} >
