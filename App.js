@@ -1,5 +1,19 @@
 import React, { useState } from 'react';
-import { StyleSheet, Button, View, SafeAreaView, FlatList, Text, TouchableOpacity, ImageBackground, Image, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
+import { 
+  StyleSheet, 
+  Modal, 
+  View, 
+  SafeAreaView, 
+  FlatList, 
+  Text, 
+  TouchableOpacity, 
+  TouchableHighlight, 
+  ImageBackground, 
+  Image, 
+  TextInput, 
+  KeyboardAvoidingView, 
+  Platform 
+    } from 'react-native';
 import { ListItem, Avatar } from 'react-native-elements';
 import { Camera } from 'expo-camera';
 import { createSlice, configureStore } from '@reduxjs/toolkit';
@@ -56,6 +70,8 @@ export default function App() {
     const [startCamera,setStartCamera] = useState(false);
     const [previewVisible, setPreviewVisible] = useState(false);
     const [capturedImage, setCapturedImage] = useState(null);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [modalIndex, setModalIndex] = useState(null);
     const photos = store.getState().photos;
     
     const __startCamera = async () => {
@@ -239,28 +255,54 @@ export default function App() {
           
           style={styles.listView}
         >
-          <FlatList 
-            data={photos}
-            renderItem={({ item, index }) => (
-              <ListItem 
-                bottomDivider 
-                roundAvatar
-              >
-                <Avatar rounded source={{uri: item.uri}} />
-                <ListItem.Content>
-                  <ListItem.Input
-                    placeholder={item.label}
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+              Alert.alert('Modal has been closed.');
+            }}>
+              <View style={styles.centeredView}>
+                <View style={styles.modalView}>
+                  <TextInput
+                    placeholder='placeholder'
                     placeholderTextColor='black'
                     style={{textAlign: 'left'}}
                     clearButtonMode='while-editing'
                     returnKeyType='done'
                     maxLength={40} 
                     onChangeText={text => {
-                      store.dispatch(editPhotoLabel({index: index, label: text}))
+                      store.dispatch(editPhotoLabel({index: modalIndex, label: text}))
                     }
                   }
-                  />
+                  >
+                  </TextInput>
+                  <TouchableHighlight
+                    style={{ ...styles.button, backgroundColor: '#2196F3' }}
+                    onPress={() => {
+                      setModalVisible(!modalVisible);
+                    }}>
+                    <Text style={styles.textStyle}>Done</Text>
+                  </TouchableHighlight>
+                </View>
+              </View>
+          </Modal>
+          <FlatList 
+            data={photos}
+            renderItem={({ item, index }) => (
+              <ListItem 
+                bottomDivider 
+                roundAvatar
+                onPress={() => {
+                  setModalIndex(index)
+                  setModalVisible(!modalVisible)}
+                }
+              >
+                <Avatar rounded source={{uri: item.uri}} />
+                <ListItem.Content>
+                  <ListItem.Title>{item.label}</ListItem.Title>
                 </ListItem.Content>
+                <ListItem.Chevron/>
               </ListItem> 
             )}
               keyExtractor={(item, index) => index.toString()}
@@ -351,5 +393,23 @@ const styles = StyleSheet.create({
       color: 'white',
       fontSize: 18,
       textAlign: 'center'
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
     }
+  },
 });
