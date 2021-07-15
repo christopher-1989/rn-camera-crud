@@ -225,8 +225,19 @@ export default function App() {
       : 
       // If the camera has not been started display a button to take a picture.
       // If photos are available, display them in the View.
-      (<KeyboardAvoidingView behavior={Platform.OS == 'ios' ? 'position' : 'height'}>
-          <FlatList 
+      (<View
+        style={{
+          flex: 1,
+          width: '100%',
+          backgroundColor: 'transparent',
+          flexDirection: 'row'
+        }}
+      >
+      
+        <KeyboardAvoidingView behavior={Platform.OS == 'ios' ? 'position' : 'height'} style={styles.listView}>
+          
+          
+              <FlatList 
           data={photos}
           renderItem={({ item, index }) => (
             <ListItem bottomDivider roundAvatar>
@@ -241,34 +252,40 @@ export default function App() {
         }
           keyExtractor={(item, index) => index.toString()}
           />
-            {/* {photos.map((photo, index) => (
-                <View key={`container${index}`} >
-                  <Image key={`image${index}`} style={{width: 150, height: 150}} source={{uri: photo.uri}} />
-                  <TextInput 
-                    key={`photo${index}`} 
-                    placeholder={photo.label}
-                    placeholderTextColor='black'
-                    clearButtonMode='always'
-                    returnKeyType='done'
-                    maxLength={40} 
-                    onChangeText={text => {
-                      store.dispatch(editPhotoLabel({index: index, label: text}))
-                    }
-                  }
-                    />
-                </View>
-            ))
-                } */}
-            <TouchableOpacity
-            onPress={__startCamera}
-            style={styles.button} >
-            <Text
-              style={styles.buttonText}
-            >
-              Add photo
-            </Text>
-          </TouchableOpacity>
-        </KeyboardAvoidingView>)}
+
+</KeyboardAvoidingView>
+                  <View
+              style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  flexDirection: 'row',
+                  flex: 1,
+                  width: '100%',
+                  // padding: 20,
+                  justifyContent: 'space-between'
+                  }}
+                >
+                  <View
+                  style={{
+                          alignSelf: 'center',
+                          flex: 1,
+                          alignItems: 'center'
+                        }}
+                    >
+                      <TouchableOpacity
+                        onPress={__startCamera}
+                        style={styles.saveButton} >
+                      <Text
+                        style={styles.buttonText}
+                        >
+                        Add photo
+                  </Text>
+              </TouchableOpacity>
+              </View>
+          </View>
+        </View>
+          
+        )}
     </SafeAreaView>
   );}
 
@@ -279,9 +296,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  inner: {
+  listView: {
     flex: 1,
-    
   },
   layout: {
     flex: 1,
@@ -308,9 +324,18 @@ const styles = StyleSheet.create({
       margin: 15,
       backgroundColor: 'blue',
       borderRadius: 5,
+      width: 150,
     },
-    buttonText: {
+  saveButton: {
+    backgroundColor: 'blue',
+    borderRadius: 5,
+    padding: 20,
+    width: 150,
+    bottom: 0,
+  },
+  buttonText: {
       color: 'white',
       fontSize: 18,
+      textAlign: 'center'
     }
 });
