@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, SafeAreaView, FlatList, Text, TouchableOpacity, ImageBackground, Image, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
+import { StyleSheet, Button, View, SafeAreaView, FlatList, Text, TouchableOpacity, ImageBackground, Image, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 import { ListItem, Avatar } from 'react-native-elements';
 import { Camera } from 'expo-camera';
 import { createSlice, configureStore } from '@reduxjs/toolkit';
@@ -234,56 +234,69 @@ export default function App() {
         }}
       >
       
-        <KeyboardAvoidingView behavior={Platform.OS == 'ios' ? 'position' : 'height'} style={styles.listView}>
+        <KeyboardAvoidingView 
+          behavior={Platform.OS == "ios" ? "position" : "height"}
           
-          
-              <FlatList 
-          data={photos}
-          renderItem={({ item, index }) => (
-            <ListItem bottomDivider roundAvatar>
-              <Avatar rounded source={{uri: item.uri}} />
-              <ListItem.Content>
-                <ListItem.Title>{item.label}</ListItem.Title>
-                <ListItem.Subtitle>{item.label}</ListItem.Subtitle>
-              </ListItem.Content>
-              <ListItem.Chevron />
-            </ListItem> ) 
-        
-        }
-          keyExtractor={(item, index) => index.toString()}
-          />
-
-</KeyboardAvoidingView>
-                  <View
-              style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  flexDirection: 'row',
-                  flex: 1,
-                  width: '100%',
-                  // padding: 20,
-                  justifyContent: 'space-between'
-                  }}
-                >
-                  <View
-                  style={{
-                          alignSelf: 'center',
-                          flex: 1,
-                          alignItems: 'center'
-                        }}
-                    >
-                      <TouchableOpacity
-                        onPress={__startCamera}
-                        style={styles.saveButton} >
-                      <Text
-                        style={styles.buttonText}
-                        >
-                        Add photo
-                  </Text>
-              </TouchableOpacity>
-              </View>
+          style={styles.listView}
+        >
+          <FlatList 
+            data={photos}
+            renderItem={({ item, index }) => (
+              <ListItem 
+                bottomDivider 
+                roundAvatar
+              >
+                <Avatar rounded source={{uri: item.uri}} />
+                <ListItem.Content>
+                  <ListItem.Input
+                    placeholder={item.label}
+                    placeholderTextColor='black'
+                    style={{textAlign: 'left'}}
+                    clearButtonMode='while-editing'
+                    returnKeyType='done'
+                    maxLength={40} 
+                    onChangeText={text => {
+                      store.dispatch(editPhotoLabel({index: index, label: text}))
+                    }
+                  }
+                  />
+                </ListItem.Content>
+              </ListItem> 
+            )}
+              keyExtractor={(item, index) => index.toString()}
+              />
+        </KeyboardAvoidingView>
+        <View 
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            flexDirection: 'row',
+            flex: 1,
+            width: '100%',
+            // padding: 20,
+            justifyContent: 'space-between'
+            }}
+        >
+          <View
+            style={{
+              alignSelf: 'center',
+              flex: 1,
+              alignItems: 'center'
+            }}
+          >
+            <TouchableOpacity
+            onPress={__startCamera}
+            style={styles.saveButton} 
+            >
+              <Text
+                style={styles.buttonText}
+              >
+                Add photo
+              </Text>
+            </TouchableOpacity>
           </View>
-        </View>
+        </View> 
+    </View>
           
         )}
     </SafeAreaView>
@@ -298,6 +311,7 @@ const styles = StyleSheet.create({
   },
   listView: {
     flex: 1,
+    maxHeight: '90%'
   },
   layout: {
     flex: 1,
