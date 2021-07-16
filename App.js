@@ -46,23 +46,6 @@ const store = configureStore({
   reducer: photosSlice.reducer
 })
 
-const Item = ({ photo, index }) => (
-  <View >
-    <Image style={{width: 150, height: 150}} source={{uri: photo.uri}} />
-    <TextInput 
-          placeholder={photo.label}
-          placeholderTextColor='black'
-          clearButtonMode='always'
-          returnKeyType='done'
-          maxLength={40} 
-          onChangeText={text => {
-            store.dispatch(editPhotoLabel({index: index, label: text}))
-          }
-        }
-        />
-  </View>
-);
-
 // Can still subscribe to the store
 // store.subscribe(() => console.log(store.getState()));
 
@@ -102,8 +85,6 @@ export default function App() {
     }
 
     const __savePicture = () => {
-        // setPhotos([...photos, capturedImage])
-        // console.log(capturedImage);
         store.dispatch(addPhoto({uri: capturedImage.uri}))
         setStartCamera(false);
         setCapturedImage(null);
@@ -168,27 +149,27 @@ export default function App() {
                   }}
                 >
           
-                    <TouchableOpacity
-                        onPress={__retakePicture}
-                        style={styles.button}
-                        >
-                        <Text
-                        style={styles.buttonText}
-                        >
-                        Retake
-                        </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        onPress={__savePicture}
-                        style={styles.button}
-                        >
-                        <Text
-                        style={styles.buttonText}
-                        >
-                        Save
-                        </Text>
-                    </TouchableOpacity>
-                </View>
+                <TouchableOpacity
+                    onPress={__retakePicture}
+                    style={styles.button}
+                    >
+                    <Text
+                    style={styles.buttonText}
+                    >
+                    Retake
+                    </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={__savePicture}
+                    style={styles.button}
+                    >
+                    <Text
+                    style={styles.buttonText}
+                    >
+                    Save
+                    </Text>
+                </TouchableOpacity>
+              </View>
             </View>
         </View>
         ) : 
@@ -199,14 +180,15 @@ export default function App() {
               camera = r
             }}
           >
-            <View
-              style={{
-                flex: 1,
-                width: '100%',
-                backgroundColor: 'transparent',
-                flexDirection: 'row'
-              }}
-            ><View
+          <View
+            style={{
+              flex: 1,
+              width: '100%',
+              backgroundColor: 'transparent',
+              flexDirection: 'row'
+            }}
+            >
+              <View
                 style={{
                   position: 'absolute',
                   top: 0,
@@ -223,12 +205,12 @@ export default function App() {
                 }}
               >
               <TouchableOpacity
-                    onPress={() => setStartCamera(false)}
-                    style={{padding: 20}} 
-                    >
-                      <Text style={{textAlign: 'right'}} >
-                        <Ionicons name="close" size={40} color="white" />
-                      </Text>
+                onPress={() => setStartCamera(false)}
+                style={{padding: 20}} 
+                >
+                  <Text style={{textAlign: 'right'}} >
+                    <Ionicons name="close" size={40} color="white" />
+                  </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -250,7 +232,6 @@ export default function App() {
                     alignItems: 'center'
                   }}
                 >
-                  
                   <TouchableOpacity
                     onPress={__takePicture}
                     style={{
@@ -277,10 +258,8 @@ export default function App() {
           flexDirection: 'row'
         }}
       >
-      
         <KeyboardAvoidingView 
           behavior={Platform.OS == "ios" ? "padding" : "height"}
-          
           style={styles.listView}
         >
           <Modal
@@ -373,12 +352,6 @@ export default function App() {
   );}
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   listView: {
     flex: 1,
     maxHeight: '90%'
@@ -391,17 +364,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     marginBottom: 16,
-  },
-  card: {
-      width: '90%',
-      padding: 10,
-      borderRadius: 10,
-  },
-  cardTitle: {
-      fontSize: 18,
-  },
-  cardDetails: {
-
   },
   button: {
       padding: 20,
