@@ -17,6 +17,8 @@ import {
 import { ListItem, Avatar } from 'react-native-elements';
 import { Camera } from 'expo-camera';
 import { createSlice, configureStore } from '@reduxjs/toolkit';
+import { Ionicons } from '@expo/vector-icons';
+
 
 const photosSlice = createSlice({
   name: 'photos',
@@ -66,7 +68,7 @@ const Item = ({ photo, index }) => (
 
 export default function App() {
   
-    const [startCamera,setStartCamera] = useState(false);
+    const [startCamera, setStartCamera] = useState(false);
     const [previewVisible, setPreviewVisible] = useState(false);
     const [capturedImage, setCapturedImage] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
@@ -84,51 +86,51 @@ export default function App() {
         }
       }
 
-      let camera = Camera;
-    
-      const __takePicture = async () => {
-        if (!camera) return
-        const photo = await camera.takePictureAsync();
-        setPreviewVisible(true);
-        setCapturedImage(photo);
-      }
+    let camera = Camera;
+  
+    const __takePicture = async () => {
+      if (!camera) return
+      const photo = await camera.takePictureAsync();
+      setPreviewVisible(true);
+      setCapturedImage(photo);
+    }
 
-      const __retakePicture = () => {
+    const __retakePicture = () => {
+      setCapturedImage(null);
+      setPreviewVisible(false);
+      __startCamera();
+    }
+
+    const __savePicture = () => {
+        // setPhotos([...photos, capturedImage])
+        // console.log(capturedImage);
+        store.dispatch(addPhoto({uri: capturedImage.uri}))
+        setStartCamera(false);
         setCapturedImage(null);
         setPreviewVisible(false);
-        __startCamera();
-      }
-
-      const __savePicture = () => {
-          // setPhotos([...photos, capturedImage])
-          // console.log(capturedImage);
-          store.dispatch(addPhoto({uri: capturedImage.uri}))
-          setStartCamera(false);
-          setCapturedImage(null);
-          setPreviewVisible(false);
-      }
-    
-      const CameraPreview = ({ photo }) => {
-        return (
-          <View
+    }
+  
+    const CameraPreview = ({ photo }) => {
+      return (
+        <View
+          style={{
+            backgroundColor: 'transparent',
+            flex: 1,
+            width: '100%',
+            height: '100%'
+          }}
+        >
+          <ImageBackground
+            source={{uri: photo.uri}}
             style={{
-              backgroundColor: 'transparent',
-              flex: 1,
-              width: '100%',
-              height: '100%'
+              flex: 1
             }}
-          >
-            <ImageBackground
-              source={{uri: photo.uri}}
-              style={{
-                flex: 1
-              }}
-            />
-          </View>
-        )
-      }
+          />
+        </View>
+      )
+    }
 
-        return (
+    return (
 
     <SafeAreaView style={styles.layout} >
       <Text style={styles.title}>Photos</Text>
@@ -204,7 +206,32 @@ export default function App() {
                 backgroundColor: 'transparent',
                 flexDirection: 'row'
               }}
-            >
+            ><View
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  right: 0,
+                  flexDirection: 'row',
+                  flex: 1,
+                  width: '100%',
+                  padding: 20,
+                }}
+              >
+              <View 
+                style={{
+                  flex: 1,
+                }}
+              >
+              <TouchableOpacity
+                    onPress={() => setStartCamera(false)}
+                    style={{padding: 20}} 
+                    >
+                      <Text style={{textAlign: 'right'}} >
+                        <Ionicons name="close" size={40} color="white" />
+                      </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
               <View
                 style={{
                   position: 'absolute',
@@ -223,11 +250,12 @@ export default function App() {
                     alignItems: 'center'
                   }}
                 >
+                  
                   <TouchableOpacity
                     onPress={__takePicture}
                     style={{
-                      width: 70,
-                      height: 70,
+                      width: 80,
+                      height: 80,
                       bottom: 0,
                       borderRadius: 50,
                       backgroundColor: '#fffe'
@@ -378,12 +406,12 @@ const styles = StyleSheet.create({
   button: {
       padding: 20,
       margin: 15,
-      backgroundColor: 'blue',
+      backgroundColor: '#2196F3',
       borderRadius: 5,
       width: 150,
     },
   saveButton: {
-    backgroundColor: 'blue',
+    backgroundColor: '#2196F3',
     borderRadius: 5,
     padding: 20,
     width: 150,
