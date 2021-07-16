@@ -25,10 +25,9 @@ const photosSlice = createSlice({
   },
   reducers: {
     addPhoto (state, action) {
-      const photoNumber = state.photos.length + 1;
       const newPhoto = {
         uri: action.payload.uri,
-        label: `Photo number ${photoNumber}`
+        label: `New photo`
       }
       state.photos.push(newPhoto)
     },
@@ -72,6 +71,7 @@ export default function App() {
     const [capturedImage, setCapturedImage] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
     const [modalIndex, setModalIndex] = useState(null);
+    const [selectedPhoto, setSelectedPhoto] = useState({});
     const photos = store.getState().photos;
     
     const __startCamera = async () => {
@@ -251,7 +251,7 @@ export default function App() {
       >
       
         <KeyboardAvoidingView 
-          behavior={Platform.OS == "ios" ? "position" : "height"}
+          behavior={Platform.OS == "ios" ? "padding" : "height"}
           
           style={styles.listView}
         >
@@ -264,10 +264,10 @@ export default function App() {
             }}>
               <View style={styles.centeredView}>
                 <View style={styles.modalView}>
-                  <TextInput
-                    placeholder='placeholder'
+                <TextInput
+                    placeholder={`${selectedPhoto.label}`}
                     placeholderTextColor='black'
-                    style={{textAlign: 'left'}}
+                    style={{width: '100%', textAlign: 'center', fontSize: 24, marginBottom: 20}}
                     clearButtonMode='while-editing'
                     returnKeyType='done'
                     maxLength={40} 
@@ -275,14 +275,14 @@ export default function App() {
                       store.dispatch(editPhotoLabel({index: modalIndex, label: text}))
                     }
                   }
-                  >
-                  </TextInput>
+                  />
+                  <Image style={{width: 300, height: 450}} source={{uri: selectedPhoto.uri}} />
                   <TouchableHighlight
                     style={{ ...styles.button, backgroundColor: '#2196F3' }}
                     onPress={() => {
                       setModalVisible(!modalVisible);
                     }}>
-                    <Text style={styles.textStyle}>Done</Text>
+                    <Text style={styles.buttonText}>Done</Text>
                   </TouchableHighlight>
                 </View>
               </View>
@@ -295,12 +295,13 @@ export default function App() {
                 roundAvatar
                 onPress={() => {
                   setModalIndex(index)
+                  setSelectedPhoto(item)
                   setModalVisible(!modalVisible)}
                 }
               >
                 <Avatar rounded source={{uri: item.uri}} />
                 <ListItem.Content>
-                  <ListItem.Title>{item.label}</ListItem.Title>
+                  <ListItem.Title>{`${index + 1}.  ${item.label}`}</ListItem.Title>
                 </ListItem.Content>
                 <ListItem.Chevron/>
               </ListItem> 
@@ -315,7 +316,6 @@ export default function App() {
             flexDirection: 'row',
             flex: 1,
             width: '100%',
-            // padding: 20,
             justifyContent: 'space-between'
             }}
         >
@@ -401,6 +401,8 @@ const styles = StyleSheet.create({
     marginTop: 22,
   },
   modalView: {
+    width: '100%',
+    maxHeight: '90%',
     margin: 20,
     backgroundColor: 'white',
     borderRadius: 20,
@@ -410,6 +412,9 @@ const styles = StyleSheet.create({
     shadowOffset: {
       width: 0,
       height: 2,
-    }
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
 });
