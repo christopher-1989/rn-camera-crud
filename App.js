@@ -89,6 +89,9 @@ export default function App() {
         setStartCamera(false);
         setCapturedImage(null);
         setPreviewVisible(false);
+        setModalIndex(photos.length)
+        setSelectedPhoto(capturedImage);
+        setModalVisible(true);
     }
   
     const CameraPreview = ({ photo }) => {
@@ -272,7 +275,7 @@ export default function App() {
               <View style={styles.centeredView}>
                 <View style={styles.modalView}>
                 <TextInput
-                    placeholder={`${selectedPhoto.label}`}
+                    placeholder={selectedPhoto.label ? `${selectedPhoto.label}` : `Edit photo label`}
                     placeholderTextColor='black'
                     style={{width: '100%', textAlign: 'center', fontSize: 24, marginBottom: 20}}
                     clearButtonMode='while-editing'
