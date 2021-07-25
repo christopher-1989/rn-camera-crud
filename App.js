@@ -242,9 +242,31 @@ export default function App() {
                       height: 80,
                       bottom: 0,
                       borderRadius: 50,
-                      backgroundColor: '#fffe'
+                      backgroundColor: '#fffe',
+                      justifyContent: 'center',
+                      alignItems: 'center'
                     }}
-                  />
+                  >
+                    <View
+                    style={{
+                      backgroundColor: '#232323',
+                      width: 70,
+                      height: 70,
+                      borderRadius: 50,
+                      justifyContent: 'center',
+                      alignItems: 'center'
+                    }}
+                    >
+                      <View
+                      style={{
+                        backgroundColor: '#fffe',
+                        width: 65,
+                        height: 65,
+                        borderRadius: 50,
+                        }}>
+                     </View>
+                    </View>
+                  </TouchableOpacity>
                 </View>
               </View>
             </View>
